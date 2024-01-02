@@ -1,32 +1,26 @@
-import java.util.*;
+import java.util.Date;
+
+
 public class Subject {
     private final String name;
-    private List<Grade> grades;
-    public Subject(String name){
+    private final Teacher teacher;
+
+
+    public Subject(String name, Teacher teacher) {
         this.name = name;
-        this.grades = new ArrayList<>();
+        this.teacher = teacher;
     }
+
     public String getName() {
         return name;
     }
-    public List<Grade> getGrades(){
-        return grades;
-    }
-    public void addGrade(double value, Date inserationDate){
-        Grade grade = new Grade(value, inserationDate);
-        grades.add(grade);
-    }
-    public double finalGrade(){
-        if(grades.isEmpty()){
-            return 0.0;
-        }
-        double sum = 0;
-        for (Grade grade : grades){
-            sum += grade.getValue();
-        }
-        return sum/grades.size();
-    }
 
+    public Teacher getTeacher() {
+        return teacher;
+    }
+    public void addGrade(Student student, double value, Date insertionDate) {
+        student.addGrade(this, value, insertionDate);
+    }
 
 
 }
