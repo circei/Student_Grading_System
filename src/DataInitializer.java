@@ -91,7 +91,8 @@ public class DataInitializer {
 
                 if (existingSubject != null) {
                     // If the subject already exists, associate it with the student
-                    student.addGrade(existingSubject, 0.0, null);
+                    student.addSubject(existingSubject);
+                    existingSubject.enrollStudent(student);
                 }
                 // You may want to handle the case where the subject doesn't exist,
                 // depending on your specific requirements.
@@ -100,5 +101,7 @@ public class DataInitializer {
 
         return student;
     }
+
+
 
 }

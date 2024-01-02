@@ -1,0 +1,4 @@
+Constantin George: Informatica,Fizica,Economie
+Jugaru Cosmin:Sport,Informatica,Matematica
+Camil Laurentiu:Automatica,Fizica,Economie,Informatica
+Teodor Gandila:Economie,Sport,Automatica,Informatica

@@ -1,11 +1,16 @@
 import java.util.*;
-public class Student {
+public class Student implements User {
     private String name;
+    private String password = "student";
     private Map<Subject, List<Grade>> gradesBySubject;
 
     public Student(String name) {
         this.name = name;
         this.gradesBySubject = new HashMap<>();
+
+    }
+    public boolean authenticate(String enteredPassword) {
+        return this.password.equals(enteredPassword);
     }
 
     public String getName() {
@@ -17,13 +22,48 @@ public class Student {
     }
 
     public void addGrade(Subject subject, double value, Date insertionDate) {
-        Grade grade = new Grade(value, insertionDate);
+        // Check if the subject is associated with a teacher
+        if (subject.getTeacher() != null) {
+            Teacher teacher = subject.getTeacher();
 
+            // Check if the teacher has the permission to add grades for the specified subject
+            if (teacher.hasSubjectPermissions("CREATE_GRADE_" + subject.getName())) {
+                Grade grade = new Grade(value, insertionDate);
+
+                if (!gradesBySubject.containsKey(subject)) {
+                    gradesBySubject.put(subject, new ArrayList<>());
+                }
+
+                gradesBySubject.get(subject).add(grade);
+            } else {
+                // Handle the case where the teacher does not have the necessary permission
+                System.out.println("Teacher does not have permission to add grades for " + subject.getName());
+            }
+        } else {
+            // Handle the case where the subject is not associated with a teacher
+            System.out.println("Subject is not associated with a teacher");
+        }
+    }
+    public void addSubject(Subject subject) {
         if (!gradesBySubject.containsKey(subject)) {
             gradesBySubject.put(subject, new ArrayList<>());
         }
+    }
 
-        gradesBySubject.get(subject).add(grade);
+    @Override
+    public String getUsername() {
+        // Assuming the student's name can be used as a username
+        return name;
+    }
+    @Override
+    public String getRole() {
+        return "STUDENT";
+    }
+
+    @Override
+    public Set<String> getPermissions() {
+        // Assuming that students only have READ permission
+        return Collections.singleton("READ");
     }
 
 
