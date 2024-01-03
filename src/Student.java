@@ -21,13 +21,13 @@ public class Student implements User {
         return gradesBySubject;
     }
 
-    public void addGrade(Subject subject, double value, Date insertionDate) {
+    public void addGrade(Subject subject, double value, Date insertionDate, Teacher teacher) {
         // Check if the subject is associated with a teacher
         if (subject.getTeacher() != null) {
-            Teacher teacher = subject.getTeacher();
+
 
             // Check if the teacher has the permission to add grades for the specified subject
-            if (teacher.hasSubjectPermissions("CREATE_GRADE_" + subject.getName())) {
+            if (teacher.hasSubjectPermissions(subject.getName())) {
                 Grade grade = new Grade(value, insertionDate);
 
                 if (!gradesBySubject.containsKey(subject)) {
@@ -35,9 +35,12 @@ public class Student implements User {
                 }
 
                 gradesBySubject.get(subject).add(grade);
+
+                System.out.println("Grade added successfully.");
             } else {
                 // Handle the case where the teacher does not have the necessary permission
                 System.out.println("Teacher does not have permission to add grades for " + subject.getName());
+
             }
         } else {
             // Handle the case where the subject is not associated with a teacher

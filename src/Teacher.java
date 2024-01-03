@@ -14,6 +14,8 @@ public class Teacher implements User {
         this.subjects = new HashMap<>();
         this.permissions = new HashSet<>();
         this.dataInitializer = dataInitializer;
+
+
     }
 
 
@@ -39,9 +41,12 @@ public class Teacher implements User {
     }
     public void initializePermissions() {
         // Grant CRUD permissions for each subject the teacher teaches
-        subjects.keySet().forEach(this::grantSubjectPermissions);
+        subjects.keySet().forEach(subjectName -> {
+            grantSubjectPermissions(subjectName);
+        });
     }
     private void grantSubjectPermissions(String subjectName) {
+        subjectName = subjectName.trim();
         permissions.add("CREATE_GRADE_" + subjectName);
         permissions.add("UPDATE_GRADE_" + subjectName);
         permissions.add("DELETE_GRADE_" + subjectName);
@@ -64,9 +69,11 @@ public class Teacher implements User {
     }
 
     public boolean hasSubjectPermissions(String subjectName) {
-        return permissions.contains("CREATE_GRADE_" + subjectName)
-                && permissions.contains("UPDATE_GRADE_" + subjectName)
-                && permissions.contains("DELETE_GRADE_" + subjectName);
+        boolean createPermission = permissions.contains("CREATE_GRADE_" + subjectName);
+        boolean updatePermission = permissions.contains("UPDATE_GRADE_" + subjectName);
+        boolean deletePermission = permissions.contains("DELETE_GRADE_" + subjectName);
+
+        return createPermission && updatePermission && deletePermission;
     }
 
 }
