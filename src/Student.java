@@ -1,3 +1,6 @@
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 public class Student implements User {
     private String name;
@@ -7,6 +10,11 @@ public class Student implements User {
     public Student(String name) {
         this.name = name;
         this.gradesBySubject = new HashMap<>();
+        File file = new File("grades_" + getName() + ".txt");
+        if (file.exists()) {
+            // Read data from the file and initialize gradesBySubject
+            initializeGradesFromFile(file);
+        }
 
     }
     public boolean authenticate(String enteredPassword) {
@@ -35,6 +43,7 @@ public class Student implements User {
                 }
 
                 gradesBySubject.get(subject).add(grade);
+                saveGradesToFile(subject,grade);
 
                 System.out.println("Grade added successfully.");
             } else {
@@ -86,4 +95,60 @@ public class Student implements User {
 
         return finalGrades;
     }
+
+
+    public void saveGradesToFile(Subject subject, Grade grade) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("grades_" + getName() + ".txt", true))) {
+            // Append the specific grade for the given subject
+            writer.println("Subject: " + subject.getName());
+            writer.println("Grade: " + grade.getValue());
+            writer.println("Date: " + grade.getInserationDate());
+            writer.println("-----");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initializeGradesFromFile(File file) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            Subject currentSubject = null;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("Subject: ")) {
+                    // Extract subject name and create a new Subject object
+                    String subjectName = line.substring("Subject: ".length());
+                    currentSubject = new Subject(subjectName, null); // You may need to provide a Teacher here
+                    gradesBySubject.put(currentSubject, new ArrayList<>());
+                } else if (line.startsWith("Grade: ")) {
+                    // Extract grade value
+                    double gradeValue = Double.parseDouble(line.substring("Grade: ".length()));
+
+                    // Read next line to get the date (assuming it is formatted properly)
+                    String dateString = reader.readLine();
+                    Date gradeDate = parseDate(dateString);
+
+                    Grade grade = new Grade(gradeValue, gradeDate);
+                    // Add the grade to the current subject
+                    gradesBySubject.get(currentSubject).add(grade);
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Date parseDate(String dateLine) {
+        Date gradeDate = null;
+        try {
+            // Adjust the date format pattern to match the actual format
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+            gradeDate = dateFormat.parse(dateLine.substring("Date: ".length()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return gradeDate;
+    }
+
+
 }

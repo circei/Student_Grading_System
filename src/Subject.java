@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Subject {
+public class Subject implements Serializable {
     private final String name;
     private final Teacher teacher;
     private List<Student> enrolledStudents;

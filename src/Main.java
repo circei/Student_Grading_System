@@ -1,9 +1,6 @@
 
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.HashMap;
-import java.util.Date;
+import java.util.*;
+
 public class Main {
     private static Map<String, String> userCredentials = new HashMap<>();
     static DataInitializer dataInitializer = new DataInitializer();
@@ -333,23 +330,55 @@ public class Main {
         }
     }
     private static Student selectStudent(Subject subject, Scanner scanner) {
-        System.out.println("Select a student:");
-
-        // Display a numbered list of students who have the selected subject
         List<Student> studentsWithSubject = subject.getEnrolledStudents();
-        int studentNumber = 1;
-        for (Student student : studentsWithSubject) {
-            System.out.println(studentNumber + ". " + student.getName());
-            studentNumber++;
+        System.out.println("Do you want to sort the student list alphabetically? (yes/no)");
+        String sortOption = scanner.next().toLowerCase();
+
+        if (sortOption.equals("yes")) {
+            System.out.println("Select a student:");
+            sortStudentListAlphabetically(studentsWithSubject);
+            int selectedNumber = scanner.nextInt();
+            // Ensure the selected number is within the valid range
+            if (selectedNumber >= 1 && selectedNumber <= studentsWithSubject.size()) {
+                return studentsWithSubject.get(selectedNumber - 1);
+            } else {
+                System.out.println("Invalid selection.");
+                return null;
+            }
+        }
+        else{
+            System.out.println("Select a student:");
+            int studentNumber = 1;
+            for (Student student : studentsWithSubject) {
+                System.out.println(studentNumber + ". " + student.getName());
+                studentNumber++;
+            }
+
+            int selectedNumber = scanner.nextInt();
+            // Ensure the selected number is within the valid range
+            if (selectedNumber >= 1 && selectedNumber <= studentsWithSubject.size()) {
+                return studentsWithSubject.get(selectedNumber - 1);
+            } else {
+                System.out.println("Invalid selection.");
+                return null;
+            }
         }
 
-        int selectedNumber = scanner.nextInt();
-        // Ensure the selected number is within the valid range
-        if (selectedNumber >= 1 && selectedNumber <= studentsWithSubject.size()) {
-            return studentsWithSubject.get(selectedNumber - 1);
-        } else {
-            System.out.println("Invalid selection.");
-            return null;
+
+
+        // Display a numbered list of students who have the selected subject
+
+
+    }
+
+    private static void sortStudentListAlphabetically(List<Student> studentsWithSubject) {
+        // Implement logic to sort the student list alphabetically
+        Collections.sort(studentsWithSubject, Comparator.comparing(Student::getName));
+
+        // Display the sorted list
+        System.out.println("Sorted Student List Alphabetically:");
+        for (int i = 0; i < studentsWithSubject.size(); i++) {
+            System.out.println((i + 1) + ". " + studentsWithSubject.get(i).getName());
         }
     }
 
