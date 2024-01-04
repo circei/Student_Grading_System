@@ -140,16 +140,46 @@ public class Main {
             // Implement logic based on the user's choice
             switch (choice) {
                 case 1:
-                    // Logic to view grades
+                    seeYourGrades(student,scanner);
                     break;
                 case 2:
-                    // Logic to calculate final grades
+                    yourFinalGrades(student,scanner);
                     break;
                 // Add more cases as needed
                 default:
                     System.out.println("Invalid choice.");
             }
         }
+    }
+    private static void yourFinalGrades(Student student, Scanner scanner) {
+            Map<Subject, Double> finalGrades = student.calculateFinalGradeForEachSubject();
+            System.out.println("Final Grades for " + student.getName() + ":");
+            for (Map.Entry<Subject, Double> entry : finalGrades.entrySet()) {
+                Subject subject = entry.getKey();
+                double finalGrade = entry.getValue();
+
+                System.out.println("Subject: " + subject.getName() + ", Final Grade: " + finalGrade);
+            }
+
+    }
+
+    private static void seeYourGrades(Student student, Scanner scanner) {
+
+        // Allow the teacher to choose a student
+        // Retrieve the grades for the selected student
+            Map<Subject, List<Grade>> gradesBySubject = student.getGradesBySubject();
+
+            System.out.println("Grades for " + student.getName() + ":");
+            for (Map.Entry<Subject, List<Grade>> entry : gradesBySubject.entrySet()) {
+                Subject subject = entry.getKey();
+                List<Grade> grades = entry.getValue();
+
+                System.out.println("Subject: " + subject.getName());
+                for (Grade grade : grades) {
+                    System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
+                }
+            }
+
     }
 
     private static void teacherMenu(Teacher teacher, Scanner scanner) {
@@ -160,10 +190,9 @@ public class Main {
         while (!exit) {
             System.out.println("Welcome, " + teacher.getName() + " (Teacher)!");
             System.out.println("1. Add Grades");
-            System.out.println("2. Manage Subjects");
-            System.out.println("3. See Grades for a Student");
-            System.out.println("4. Calculate Final Grades for a Student");
-            System.out.println("5. Calculate Final Grade For One Subject");
+            System.out.println("2. See Grades for a Student");
+            System.out.println("3. Calculate Final Grades for a Student");
+            System.out.println("4. Calculate Final Grade For One Subject");
             // Add more options as needed
             int choice = scanner.nextInt();
             // Implement logic based on the user's choice
@@ -172,15 +201,12 @@ public class Main {
                     addGrades(teacher, scanner);
                     break;
                 case 2:
-                    manageSubjects(teacher, scanner);
-                    break;
-                case 3:
                     seeGradesForStudent(teacher, scanner);
                     break;
-                case 4:
+                case 3:
                     calculateFinalGradesForStudent(teacher, scanner);
                     break;
-                case 5:
+                case 4:
                     calculateFinalGradeForOneSubject(teacher,scanner);
                     break;
                 // Add more cases as needed
