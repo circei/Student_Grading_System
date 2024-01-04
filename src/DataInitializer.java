@@ -1,11 +1,8 @@
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 public class DataInitializer {
     private static List<Subject> allSubjects = new ArrayList<>();
     public  List<Teacher> initializeTeachers(String fileName){
@@ -35,11 +32,8 @@ public class DataInitializer {
             if (existingSubject == null) {
                 Subject newSubject = new Subject(subjectName.trim(), teacher);
                 teacher.addSubject(subjectName, newSubject);
-
-                // Add the new subject to the list of all subjects
                 allSubjects.add(newSubject);
             } else {
-                // If the subject already exists, associate it with the current teacher
                 teacher.addSubject(subjectName, existingSubject);
             }
         }
@@ -47,13 +41,13 @@ public class DataInitializer {
     }
 
     private static Subject findSubjectByName(String subjectName) {
-        // Search for the subject in the list of all subjects
+
         for (Subject existingSubject : allSubjects) {
             if (existingSubject.getName().equals(subjectName)) {
                 return existingSubject;
             }
         }
-        return null; // Subject not found
+        return null;
     }
 
     public static List<Subject> getAllSubjects() {
@@ -82,7 +76,7 @@ public class DataInitializer {
 
         Student student = new Student(studentName);
 
-        // Check if there are subjects specified in the line
+
         if (parts.length > 1) {
             String[] subjectNames = parts[1].split(",");
             for (String subjectName : subjectNames) {
@@ -90,18 +84,13 @@ public class DataInitializer {
                 Subject existingSubject = findSubjectByName(subjectName);
 
                 if (existingSubject != null) {
-                    // If the subject already exists, associate it with the student
+
                     student.addSubject(existingSubject);
                     existingSubject.enrollStudent(student);
                 }
-                // You may want to handle the case where the subject doesn't exist,
-                // depending on your specific requirements.
             }
         }
 
         return student;
     }
-
-
-
 }

@@ -22,55 +22,23 @@ public class Main {
 
     }
     public static void main(String[] args) {
-
-
-
-      /*  for (Teacher teacher : teachers) {
-            System.out.println("Teacher: " + teacher.getName());
-            System.out.println("Subjects: " + teacher.getSubjects().keySet());
-
+        for(Student student : students){
+            student.initializeGradesFromList();
         }
-        List<Subject> allSubjects = DataInitializer.getAllSubjects();
-        System.out.println("\nAll Subjects:");
-        for (Subject subject : allSubjects) {
-            System.out.println(subject.getName());
-            System.out.println(subject.getTeacher().getName());
-        }
-
-
-        // Print student information
-        for (Student student : students) {
-            System.out.println("\nStudent: " + student.getName());
-            System.out.println("Subjects and Grades:");
-            Map<Subject, List<Grade>> gradesBySubject = student.getGradesBySubject();
-
-            for (Map.Entry<Subject, List<Grade>> entry : gradesBySubject.entrySet()) {
-                Subject subject = entry.getKey();
-                List<Grade> grades = entry.getValue();
-
-                System.out.println("Subject: " + subject.getName());
-                System.out.print("Grades: ");
-                grades.stream().forEach(grade -> System.out.print(grade.getValue() + " "));
-                System.out.println(); // Move to the next line for the next subject
-            }
-        }
-         */
-
-
-
-
-        Scanner scanner = new Scanner(System.in);
-        User currentUser = authenticateUser(scanner);
-        if (currentUser != null) {
-            if ("STUDENT".equals(currentUser.getRole())) {
-                studentMenu((Student) currentUser, scanner);
-            } else if ("TEACHER".equals(currentUser.getRole())) {
-                teacherMenu((Teacher) currentUser, scanner);
+        while(true) {
+            Scanner scanner = new Scanner(System.in);
+            User currentUser = authenticateUser(scanner);
+            if (currentUser != null) {
+                if ("STUDENT".equals(currentUser.getRole())) {
+                    studentMenu((Student) currentUser, scanner);
+                } else if ("TEACHER".equals(currentUser.getRole())) {
+                    teacherMenu((Teacher) currentUser, scanner);
+                } else {
+                    System.out.println("Unknown user role.");
+                }
             } else {
-                System.out.println("Unknown user role.");
+                System.out.println("Authentication failed.");
             }
-        } else {
-            System.out.println("Authentication failed.");
         }
 
     }
@@ -78,21 +46,18 @@ public class Main {
         System.out.println("Enter username:");
         String username = scanner.nextLine();
 
-        // Check if the provided username corresponds to an existing student
         for (Student student : students) {
             if (student.getUsername().equals(username)) {
                 return authenticate(student, scanner);
             }
         }
 
-        // Check if the provided username corresponds to an existing teacher
         for (Teacher teacher : teachers) {
             if (teacher.getUsername().equals(username)) {
                 return authenticate(teacher, scanner);
             }
         }
 
-        // Username not found
         System.out.println("User not in the system");
         return null;
     }
@@ -100,41 +65,25 @@ public class Main {
         System.out.println("Enter password:");
         String enteredPassword = scanner.nextLine();
 
-        // Check if the entered username is in the userCredentials map
-        if (userCredentials.containsKey(user.getUsername())) {
-            // Retrieve the stored password based on the username
-            String storedPassword = userCredentials.get(user.getUsername());
 
-            // Check if the entered password matches the stored password
+        if (userCredentials.containsKey(user.getUsername())) {
+            String storedPassword = userCredentials.get(user.getUsername());
             if (storedPassword != null && storedPassword.equals(enteredPassword)) {
                 System.out.println("Authentication successful.");
                 return user;
             }
         }
-
-        // If the username is not in the map or the password doesn't match
-
         return null;
     }
-    public static Student findStudentByName(String studentName) {
-        for (Student student : students) {
-            if (student.getName().equalsIgnoreCase(studentName)) {
-                return student;
-            }
-        }
-        return null; // Student not found
-    }
+
     private static void studentMenu(Student student, Scanner scanner) {
-        // Implement the menu for students
-        // You can provide options such as viewing grades, calculating final grades, etc.
         boolean exit = false;
         while (!exit) {
             System.out.println("Welcome, " + student.getName() + " (Student)!");
             System.out.println("1. View Grades");
             System.out.println("2. Calculate Final Grades");
-            // Add more options as needed
             int choice = scanner.nextInt();
-            // Implement logic based on the user's choice
+
             switch (choice) {
                 case 1:
                     seeYourGrades(student,scanner);
@@ -142,7 +91,6 @@ public class Main {
                 case 2:
                     yourFinalGrades(student,scanner);
                     break;
-                // Add more cases as needed
                 default:
                     System.out.println("Invalid choice.");
             }
@@ -161,9 +109,6 @@ public class Main {
     }
 
     private static void seeYourGrades(Student student, Scanner scanner) {
-
-        // Allow the teacher to choose a student
-        // Retrieve the grades for the selected student
             Map<Subject, List<Grade>> gradesBySubject = student.getGradesBySubject();
 
             System.out.println("Grades for " + student.getName() + ":");
@@ -180,8 +125,6 @@ public class Main {
     }
 
     private static void teacherMenu(Teacher teacher, Scanner scanner) {
-        // Implement the menu for teachers
-        // You can provide options such as adding grades, managing subjects, etc.
         teacher.initializePermissions();
         boolean exit = false;
         while (!exit) {
@@ -190,9 +133,7 @@ public class Main {
             System.out.println("2. See Grades for a Student");
             System.out.println("3. Calculate Final Grades for a Student");
             System.out.println("4. Calculate Final Grade For One Subject");
-            // Add more options as needed
             int choice = scanner.nextInt();
-            // Implement logic based on the user's choice
             switch (choice) {
                 case 1:
                     addGrades(teacher, scanner);
@@ -206,7 +147,6 @@ public class Main {
                 case 4:
                     calculateFinalGradeForOneSubject(teacher,scanner);
                     break;
-                // Add more cases as needed
                 default:
                     System.out.println("Invalid choice.");
             }
@@ -215,7 +155,6 @@ public class Main {
     private static void calculateFinalGradeForOneSubject(Teacher teacher,Scanner scanner){
         System.out.println("Select a subject:");
 
-        // Display a numbered list of subjects
         int subjectNumber = 1;
         for (Map.Entry<String, Subject> entry : teacher.getSubjects().entrySet()) {
             System.out.println(subjectNumber + ". " + entry.getKey());
@@ -223,9 +162,8 @@ public class Main {
         }
 
         int selectedNumber = scanner.nextInt();
-        // Ensure the selected number is within the valid range
+
         if (selectedNumber >= 1 && selectedNumber <= teacher.getSubjects().size()) {
-            // Get the selected subject by iterating through the map entries
             System.out.println(teacher.getSubjects().values().toArray(new Subject[0])[selectedNumber - 1].calculateFinalGradeForThisSubject());
         } else {
             System.out.println("Invalid selection.");
@@ -233,20 +171,26 @@ public class Main {
         }
     }
     private static void calculateFinalGradesForStudent(Teacher teacher, Scanner scanner) {
+        List<Student> students = getAllStudents();
         System.out.println("Select a student:");
+        System.out.println("Do you want to sort the student list alphabetically? (yes/no)");
+        String sortOption = scanner.next().toLowerCase();
 
-        // Display the list of available students
-        List<Student> students = getAllStudents();  // Replace with your method to get all students
-        for (int i = 0; i < students.size(); i++) {
-            System.out.println((i + 1) + ". " + students.get(i).getName());
+        if (sortOption.equals("yes")) {
+            System.out.println("Select a student:");
+            sortStudentListAlphabetically(students);
+        }
+        else{
+            System.out.println("Select a student:");
+            for (int i = 0; i < students.size(); i++) {
+                System.out.println((i + 1) + ". " + students.get(i).getName());
+            }
         }
 
-        // Allow the teacher to choose a student
         int selectedOption = scanner.nextInt();
         if (selectedOption >= 1 && selectedOption <= students.size()) {
             Student selectedStudent = students.get(selectedOption - 1);
 
-            // Calculate final grades for the selected student
             Map<Subject, Double> finalGrades = selectedStudent.calculateFinalGradeForEachSubject();
 
             System.out.println("Final Grades for " + selectedStudent.getName() + ":");
@@ -261,21 +205,31 @@ public class Main {
         }
     }
     private static void seeGradesForStudent(Teacher teacher, Scanner scanner) {
+        List<Student> students = getAllStudents();
         System.out.println("Select a student:");
+        System.out.println("Do you want to sort the student list alphabetically? (yes/no)");
+        String sortOption = scanner.next().toLowerCase();
 
-        // Display the list of available students
-        List<Student> students = getAllStudents();  // Replace with your method to get all students
-        for (int i = 0; i < students.size(); i++) {
-            System.out.println((i + 1) + ". " + students.get(i).getName());
+        if (sortOption.equals("yes")) {
+            System.out.println("Select a student:");
+            sortStudentListAlphabetically(students);
         }
-
-        // Allow the teacher to choose a student
+        else{
+            System.out.println("Select a student:");
+            for (int i = 0; i < students.size(); i++) {
+                System.out.println((i + 1) + ". " + students.get(i).getName());
+            }
+        }
         int selectedOption = scanner.nextInt();
         if (selectedOption >= 1 && selectedOption <= students.size()) {
             Student selectedStudent = students.get(selectedOption - 1);
+            System.out.println("Do you want to sort each subject's grades by date? (yes/no)");
+            String sortOption2 = scanner.next().toLowerCase();
 
-            // Retrieve the grades for the selected student
             Map<Subject, List<Grade>> gradesBySubject = selectedStudent.getGradesBySubject();
+            if (sortOption.equals("yes")) {
+                gradesBySubject.forEach((subject, grades) -> grades.sort(Comparator.comparing(Grade::getInserationDate)));
+            }
 
             System.out.println("Grades for " + selectedStudent.getName() + ":");
             for (Map.Entry<Subject, List<Grade>> entry : gradesBySubject.entrySet()) {
@@ -292,7 +246,7 @@ public class Main {
         }
     }
     private static void addGrades(Teacher teacher, Scanner scanner) {
-        // Implement logic to add grades here
+
         Subject subject = selectSubject(teacher, scanner);
 
         if (subject != null) {
@@ -302,7 +256,6 @@ public class Main {
                 System.out.println("Enter grade value:");
                 double gradeValue = scanner.nextDouble();
 
-                // Add the grade to the subject for the student
                 subject.addGrade(student, gradeValue, new Date(), teacher);
 
             }
@@ -311,7 +264,6 @@ public class Main {
     private static Subject selectSubject(Teacher teacher, Scanner scanner) {
         System.out.println("Select a subject:");
 
-        // Display a numbered list of subjects
         int subjectNumber = 1;
         for (Subject subject : DataInitializer.getAllSubjects()) {
             System.out.println(subjectNumber + ". " + subject.getName());
@@ -320,9 +272,7 @@ public class Main {
 
         int selectedNumber = scanner.nextInt();
 
-        // Ensure the selected number is within the valid range
         if (selectedNumber >= 1 && selectedNumber <= DataInitializer.getAllSubjects().size()) {
-            // Get the selected subject by iterating through the map entries
             return DataInitializer.getAllSubjects().toArray(new Subject[0])[selectedNumber - 1];
         } else {
             System.out.println("Invalid selection.");
@@ -338,7 +288,6 @@ public class Main {
             System.out.println("Select a student:");
             sortStudentListAlphabetically(studentsWithSubject);
             int selectedNumber = scanner.nextInt();
-            // Ensure the selected number is within the valid range
             if (selectedNumber >= 1 && selectedNumber <= studentsWithSubject.size()) {
                 return studentsWithSubject.get(selectedNumber - 1);
             } else {
@@ -355,7 +304,6 @@ public class Main {
             }
 
             int selectedNumber = scanner.nextInt();
-            // Ensure the selected number is within the valid range
             if (selectedNumber >= 1 && selectedNumber <= studentsWithSubject.size()) {
                 return studentsWithSubject.get(selectedNumber - 1);
             } else {
@@ -363,30 +311,13 @@ public class Main {
                 return null;
             }
         }
-
-
-
-        // Display a numbered list of students who have the selected subject
-
-
     }
 
     private static void sortStudentListAlphabetically(List<Student> studentsWithSubject) {
-        // Implement logic to sort the student list alphabetically
         Collections.sort(studentsWithSubject, Comparator.comparing(Student::getName));
-
-        // Display the sorted list
         System.out.println("Sorted Student List Alphabetically:");
         for (int i = 0; i < studentsWithSubject.size(); i++) {
             System.out.println((i + 1) + ". " + studentsWithSubject.get(i).getName());
         }
-    }
-
-
-
-    private static void manageSubjects(Teacher teacher, Scanner scanner) {
-        // Implement logic to manage subjects here
-        // For example, adding or removing subjects
-        // You can use the methods available in the Teacher class
     }
 }
