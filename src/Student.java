@@ -46,6 +46,39 @@ public class Student implements User {
             System.out.println("Subject is not associated with a teacher");
         }
     }
+    public void deleteGrade(Student student, int index, Teacher teacher, Subject subject ){
+        if (teacher.hasSubjectPermissions(subject.getName())) {
+            gradesBySubject.get(subject).remove(index);
+            overwriteGradesToFile(student);
+            System.out.println("Grade deleted");
+        }
+        else {
+            System.out.println("Teacher does not have permission to add grades for " + subject.getName());
+
+        }
+
+
+
+    }
+
+    public void overwriteGradesToFile(Student student) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("grades_" + student.getName() + ".txt"))) {
+            for (Map.Entry<Subject, List<Grade>> entry : gradesBySubject.entrySet()) {
+                Subject subject = entry.getKey();
+                List<Grade> grades = entry.getValue();
+
+                for (Grade grade : grades) {
+                    writer.println("Subject: " + subject.getName());
+                    writer.println("Grade: " + grade.getValue());
+                    writer.println("Date: " + grade.getInserationDate());
+                    writer.println("-----");
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void addSubject(Subject subject) {
         if (!gradesBySubject.containsKey(subject)) {
             gradesBySubject.put(subject, new ArrayList<>());
@@ -84,6 +117,8 @@ public class Student implements User {
             e.printStackTrace();
         }
     }
+
+
 
     private void initializeGradesFromFile(File file) {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {

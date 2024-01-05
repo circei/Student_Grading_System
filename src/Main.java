@@ -132,9 +132,9 @@ public class Main {
             System.out.println("1. Add Grades");
             System.out.println("2. Delete A Grade");
             System.out.println("3. Update A Grade");
-            System.out.println("2. See Grades for a Student");
-            System.out.println("3. Calculate Final Grades for a Student");
-            System.out.println("4. Calculate Final Grade For One Subject");
+            System.out.println("4. See Grades for a Student");
+            System.out.println("5. Calculate Final Grades for a Student");
+            System.out.println("6. Calculate Final Grade For One Subject");
             int choice = scanner.nextInt();
             switch (choice) {
                 case 1:
@@ -144,7 +144,7 @@ public class Main {
                     deleteGrade(teacher,scanner);
                     break;
                 case 3:
-                    updateGrade(teacher,scanner);
+                    //updateGrade(teacher,scanner);
                     break;
                 case 4:
                     seeGradesForStudent(teacher, scanner);
@@ -278,22 +278,21 @@ public class Main {
             List<Grade> gradesForSelectedSubject = student.getGradesBySubject().get(subject);
             if (student != null && gradesForSelectedSubject != null) {
                 System.out.println("Do you want to sort each subject's grades by date? (yes/no)");
-                String sortOption2 = scanner.next().toLowerCase();
+                String sortOption = scanner.next().toLowerCase();
 
 
-                if (sortOption2.equals("yes")) {
-                    gradesForSelectedSubject.forEach((grades) -> grades.sort(Comparator.comparing(Grade::getInserationDate)));
+                if (sortOption.equals("yes")) {
+                    Collections.sort(gradesForSelectedSubject, Comparator.comparing(Grade::getInserationDate));
                 }
 
-                System.out.println("Grades for " + student.getName() + ":");
+                System.out.println("Grades for " + student.getName() + "at subject "+subject.getName()+" :");
                 for (Grade grade : gradesForSelectedSubject) {
-                    System.out.println("Subject: " + subject.getName());
                         System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
                 }
-                System.out.println("Enter grade value:");
-                double gradeValue = scanner.nextDouble();
+                System.out.println("Enter grade index you want to delete: ");
+                int index = scanner.nextInt();
 
-                subject.addGrade(student, gradeValue, new Date(), teacher);
+                student.deleteGrade(student, index, teacher, subject);
 
             }
         }
