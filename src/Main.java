@@ -130,6 +130,8 @@ public class Main {
         while (!exit) {
             System.out.println("Welcome, " + teacher.getName() + " (Teacher)!");
             System.out.println("1. Add Grades");
+            System.out.println("2. Delete A Grade");
+            System.out.println("3. Update A Grade");
             System.out.println("2. See Grades for a Student");
             System.out.println("3. Calculate Final Grades for a Student");
             System.out.println("4. Calculate Final Grade For One Subject");
@@ -139,12 +141,18 @@ public class Main {
                     addGrades(teacher, scanner);
                     break;
                 case 2:
-                    seeGradesForStudent(teacher, scanner);
+                    deleteGrade(teacher,scanner);
                     break;
                 case 3:
-                    calculateFinalGradesForStudent(teacher, scanner);
+                    updateGrade(teacher,scanner);
                     break;
                 case 4:
+                    seeGradesForStudent(teacher, scanner);
+                    break;
+                case 5:
+                    calculateFinalGradesForStudent(teacher, scanner);
+                    break;
+                case 6:
                     calculateFinalGradeForOneSubject(teacher,scanner);
                     break;
                 default:
@@ -227,7 +235,7 @@ public class Main {
             String sortOption2 = scanner.next().toLowerCase();
 
             Map<Subject, List<Grade>> gradesBySubject = selectedStudent.getGradesBySubject();
-            if (sortOption.equals("yes")) {
+            if (sortOption2.equals("yes")) {
                 gradesBySubject.forEach((subject, grades) -> grades.sort(Comparator.comparing(Grade::getInserationDate)));
             }
 
@@ -253,6 +261,35 @@ public class Main {
             Student student = selectStudent(subject, scanner);
 
             if (student != null) {
+                System.out.println("Enter grade value:");
+                double gradeValue = scanner.nextDouble();
+
+                subject.addGrade(student, gradeValue, new Date(), teacher);
+
+            }
+        }
+    }
+    private static void deleteGrade(Teacher teacher, Scanner scanner) {
+
+        Subject subject = selectSubject(teacher, scanner);
+
+        if (subject != null) {
+            Student student = selectStudent(subject, scanner);
+            List<Grade> gradesForSelectedSubject = student.getGradesBySubject().get(subject);
+            if (student != null && gradesForSelectedSubject != null) {
+                System.out.println("Do you want to sort each subject's grades by date? (yes/no)");
+                String sortOption2 = scanner.next().toLowerCase();
+
+
+                if (sortOption2.equals("yes")) {
+                    gradesForSelectedSubject.forEach((grades) -> grades.sort(Comparator.comparing(Grade::getInserationDate)));
+                }
+
+                System.out.println("Grades for " + student.getName() + ":");
+                for (Grade grade : gradesForSelectedSubject) {
+                    System.out.println("Subject: " + subject.getName());
+                        System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
+                }
                 System.out.println("Enter grade value:");
                 double gradeValue = scanner.nextDouble();
 

@@ -61,11 +61,6 @@ public class Student implements User {
         return "STUDENT";
     }
 
-    @Override
-    public Set<String> getPermissions() {
-        return Collections.singleton("READ");
-    }
-
     public Map<Subject, Double> calculateFinalGradeForEachSubject() {
         Map<Subject, Double> finalGrades = new HashMap<>();
 

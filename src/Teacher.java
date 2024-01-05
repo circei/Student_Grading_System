@@ -32,13 +32,8 @@ public class Teacher implements User {
             subjects.put(subjectName, subject);
         }
     }
-    public void removeSubject(String subjectName){
-        subjects.remove(subjectName);
-    }
 
-    public void grantPermission(String permission) {
-        permissions.add(permission);
-    }
+
     public void initializePermissions() {
         // Grant CRUD permissions for each subject the teacher teaches
         subjects.keySet().forEach(subjectName -> {
@@ -63,10 +58,6 @@ public class Teacher implements User {
         return "TEACHER";
     }
 
-    @Override
-    public Set<String> getPermissions() {
-        return new HashSet<>(permissions);
-    }
 
     public boolean hasSubjectPermissions(String subjectName) {
         boolean createPermission = permissions.contains("CREATE_GRADE_" + subjectName);
