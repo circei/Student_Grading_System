@@ -12,6 +12,8 @@ public class Grade {
         return value;
     }
 
+    public void setValue(double newValue){this.value = newValue;}
+
     public Date getInserationDate(){
         return inserationDate;
     }

@@ -144,7 +144,7 @@ public class Main {
                     deleteGrade(teacher,scanner);
                     break;
                 case 3:
-                    //updateGrade(teacher,scanner);
+                    updateGrade(teacher,scanner);
                     break;
                 case 4:
                     seeGradesForStudent(teacher, scanner);
@@ -256,46 +256,90 @@ public class Main {
     private static void addGrades(Teacher teacher, Scanner scanner) {
 
         Subject subject = selectSubject(teacher, scanner);
+        if(teacher.hasSubjectPermissions(subject.getName())){
+            if (subject != null) {
+                Student student = selectStudent(subject, scanner);
 
-        if (subject != null) {
-            Student student = selectStudent(subject, scanner);
+                if (student != null) {
+                    System.out.println("Enter grade value:");
+                    double gradeValue = scanner.nextDouble();
 
-            if (student != null) {
-                System.out.println("Enter grade value:");
-                double gradeValue = scanner.nextDouble();
+                    subject.addGrade(student, gradeValue, new Date(), teacher);
 
-                subject.addGrade(student, gradeValue, new Date(), teacher);
-
+                }
             }
         }
+        else{
+            System.out.println("Teacher does not have permission to add grades for subject "+subject.getName());
+        }
+
     }
     private static void deleteGrade(Teacher teacher, Scanner scanner) {
 
         Subject subject = selectSubject(teacher, scanner);
+        if(teacher.hasSubjectPermissions(subject.getName())){
+            if (subject != null) {
+                Student student = selectStudent(subject, scanner);
+                List<Grade> gradesForSelectedSubject = student.getGradesBySubject().get(subject);
+                if (student != null && gradesForSelectedSubject != null) {
+                    System.out.println("Do you want to sort each subject's grades by date? (yes/no)");
+                    String sortOption = scanner.next().toLowerCase();
 
-        if (subject != null) {
-            Student student = selectStudent(subject, scanner);
-            List<Grade> gradesForSelectedSubject = student.getGradesBySubject().get(subject);
-            if (student != null && gradesForSelectedSubject != null) {
-                System.out.println("Do you want to sort each subject's grades by date? (yes/no)");
-                String sortOption = scanner.next().toLowerCase();
 
+                    if (sortOption.equals("yes")) {
+                        Collections.sort(gradesForSelectedSubject, Comparator.comparing(Grade::getInserationDate));
+                    }
 
-                if (sortOption.equals("yes")) {
-                    Collections.sort(gradesForSelectedSubject, Comparator.comparing(Grade::getInserationDate));
-                }
-
-                System.out.println("Grades for " + student.getName() + "at subject "+subject.getName()+" :");
-                for (Grade grade : gradesForSelectedSubject) {
+                    System.out.println("Grades for " + student.getName() + "at subject "+subject.getName()+" :");
+                    for (Grade grade : gradesForSelectedSubject) {
                         System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
+                    }
+                    System.out.println("Enter grade index you want to delete: ");
+                    int index = scanner.nextInt();
+
+                    student.deleteGrade(student, index, teacher, subject);
+
                 }
-                System.out.println("Enter grade index you want to delete: ");
-                int index = scanner.nextInt();
-
-                student.deleteGrade(student, index, teacher, subject);
-
             }
         }
+        else{
+            System.out.println("Teacher does not have permission to update grades for subject "+subject.getName());
+        }
+
+    }
+    private static void updateGrade(Teacher teacher, Scanner scanner) {
+
+        Subject subject = selectSubject(teacher, scanner);
+        if(teacher.hasSubjectPermissions(subject.getName())){
+            if (subject != null) {
+                Student student = selectStudent(subject, scanner);
+                List<Grade> gradesForSelectedSubject = student.getGradesBySubject().get(subject);
+                if (student != null && gradesForSelectedSubject != null) {
+                    System.out.println("Do you want to sort each subject's grades by date? (yes/no)");
+                    String sortOption = scanner.next().toLowerCase();
+
+
+                    if (sortOption.equals("yes")) {
+                        Collections.sort(gradesForSelectedSubject, Comparator.comparing(Grade::getInserationDate));
+                    }
+
+                    System.out.println("Grades for " + student.getName() + "at subject "+subject.getName()+" :");
+                    for (Grade grade : gradesForSelectedSubject) {
+                        System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
+                    }
+                    System.out.println("Enter grade index you want to update: ");
+                    int index = scanner.nextInt();
+                    System.out.println("Enter the new grade: ");
+                    double newGrade = scanner.nextDouble();
+                    student.updateGrade(student, index, teacher, subject,newGrade);
+
+                }
+            }
+        }
+        else{
+            System.out.println("Teacher does not have permission to update grades for subject "+subject.getName());
+        }
+
     }
     private static Subject selectSubject(Teacher teacher, Scanner scanner) {
         System.out.println("Select a subject:");

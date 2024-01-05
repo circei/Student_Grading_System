@@ -26,39 +26,23 @@ public class Student implements User {
     }
 
     public void addGrade(Subject subject, double value, Date insertionDate, Teacher teacher) {
-        if (subject.getTeacher() != null) {
-            if (teacher.hasSubjectPermissions(subject.getName())) {
-                Grade grade = new Grade(value, insertionDate);
-
-                if (!gradesBySubject.containsKey(subject)) {
+        Grade grade = new Grade(value, insertionDate);
+        if (!gradesBySubject.containsKey(subject)) {
                     gradesBySubject.put(subject, new ArrayList<>());
-                }
-
-                gradesBySubject.get(subject).add(grade);
-                saveGradesToFile(subject,grade);
-
-                System.out.println("Grade added successfully.");
-            } else {
-                System.out.println("Teacher does not have permission to add grades for " + subject.getName());
-
-            }
-        } else {
-            System.out.println("Subject is not associated with a teacher");
         }
+        gradesBySubject.get(subject).add(grade);
+        saveGradesToFile(subject,grade);
+        System.out.println("Grade added successfully.");
     }
     public void deleteGrade(Student student, int index, Teacher teacher, Subject subject ){
-        if (teacher.hasSubjectPermissions(subject.getName())) {
             gradesBySubject.get(subject).remove(index);
             overwriteGradesToFile(student);
             System.out.println("Grade deleted");
-        }
-        else {
-            System.out.println("Teacher does not have permission to add grades for " + subject.getName());
-
-        }
-
-
-
+    }
+    public void updateGrade(Student student, int index, Teacher teacher, Subject subject, double newGrade){
+        gradesBySubject.get(subject).get(index).setValue(newGrade);
+        overwriteGradesToFile(student);
+        System.out.println("Grade updated");
     }
 
     public void overwriteGradesToFile(Student student) {
