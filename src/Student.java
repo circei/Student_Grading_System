@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 public class Student implements User {
     private String name;
-    private String password = "student";
+
     private Map<Subject, List<Grade>> gradesBySubject;
 
     public Student(String name) {
@@ -118,7 +118,7 @@ public class Student implements User {
                             break;
                         }
                     }
-                    gradesBySubject.put(currentSubject, new ArrayList<>());
+                    gradesBySubject.putIfAbsent(currentSubject, new ArrayList<>());
                 } else if (line.startsWith("Grade: ")) {
                     double gradeValue = Double.parseDouble(line.substring("Grade: ".length()));
                     String dateString = reader.readLine();

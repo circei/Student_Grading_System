@@ -8,6 +8,10 @@ public class Grade {
         this.inserationDate = inserationDate;
     }
 
+    public Grade() {
+
+    }
+
     public double getValue(){
         return value;
     }
