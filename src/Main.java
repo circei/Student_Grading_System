@@ -1,5 +1,7 @@
 
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 public class Main {
     private static Map<String, String> userCredentials = new HashMap<>();
@@ -29,9 +31,9 @@ public class Main {
             Scanner scanner = new Scanner(System.in);
             User currentUser = authenticateUser(scanner);
             if (currentUser != null) {
-                if ("STUDENT".equals(currentUser.getRole())) {
+                if ("student".equals(currentUser.getRole())) {
                     studentMenu((Student) currentUser, scanner);
-                } else if ("TEACHER".equals(currentUser.getRole())) {
+                } else if ("teacher".equals(currentUser.getRole())) {
                     teacherMenu((Teacher) currentUser, scanner);
                 } else {
                     System.out.println("Unknown user role.");
@@ -46,21 +48,60 @@ public class Main {
         System.out.println("Enter username:");
         String username = scanner.nextLine();
 
-        for (Student student : students) {
-            if (student.getUsername().equals(username)) {
-                return authenticate(student, scanner);
+        // Query the database for user credentials using the username
+        String passwordFromDatabase = getPasswordFromDatabase(username);
+
+        if (passwordFromDatabase != null) {
+            // Compare the password from the database with the entered password
+            System.out.println("Enter password:");
+            String enteredPassword = scanner.nextLine();
+
+            if (passwordFromDatabase.equals(enteredPassword)) {
+                // Authentication successful, return the user
+                return getUserFromDatabase(username);
             }
         }
 
-        for (Teacher teacher : teachers) {
-            if (teacher.getUsername().equals(username)) {
-                return authenticate(teacher, scanner);
-            }
-        }
-
-        System.out.println("User not in the system");
+        System.out.println("Authentication failed.");
         return null;
     }
+    private static String getPasswordFromDatabase(String username) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "1q2w3e");
+            PreparedStatement statement = connection.prepareStatement("SELECT password FROM students WHERE username = ?");
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getString("password");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private static User getUserFromDatabase(String username) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "1q2w3e");
+            PreparedStatement statement = connection.prepareStatement("SELECT username FROM students WHERE username = ?");
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String retrievedUsername = resultSet.getString("username");
+                Student student = new Student(retrievedUsername);
+                return student;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null; // User not found or error occurred
+    }
+
+
     private static User authenticate(User user, Scanner scanner) {
         System.out.println("Enter password:");
         String enteredPassword = scanner.nextLine();

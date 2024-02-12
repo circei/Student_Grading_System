@@ -75,7 +75,7 @@ public class Student implements User {
     }
     @Override
     public String getRole() {
-        return "STUDENT";
+        return "student";
     }
 
     public Map<Subject, Double> calculateFinalGradeForEachSubject() {
