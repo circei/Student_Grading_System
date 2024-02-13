@@ -6,7 +6,7 @@ import java.util.Date;
 public class Main {
     private static Map<String, String> userCredentials = new HashMap<>();
     static DataInitializer dataInitializer = new DataInitializer();
-    static List<Teacher> teachers = dataInitializer.initializeTeachers("Teachers.txt");
+
     static List<Student> students = dataInitializer.initializeStudents("Students.txt");
     public static List<Student> getAllStudents(){
         return students;
@@ -68,8 +68,9 @@ public class Main {
     private static String getPasswordFromDatabase(String username) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "1q2w3e");
-            PreparedStatement statement = connection.prepareStatement("SELECT password FROM students WHERE username = ?");
+            PreparedStatement statement = connection.prepareStatement("SELECT password, role FROM students WHERE username = ? UNION SELECT password, role FROM teachers WHERE username = ?");
             statement.setString(1, username);
+            statement.setString(2, username);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -85,14 +86,22 @@ public class Main {
     private static User getUserFromDatabase(String username) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "1q2w3e");
-            PreparedStatement statement = connection.prepareStatement("SELECT username FROM students WHERE username = ?");
+            PreparedStatement statement = connection.prepareStatement("SELECT username, role FROM students WHERE username = ? UNION SELECT username, role FROM teachers WHERE username = ?");
             statement.setString(1, username);
+            statement.setString(2, username);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 String retrievedUsername = resultSet.getString("username");
-                Student student = new Student(retrievedUsername);
-                return student;
+                String role = resultSet.getString("role");
+
+                if (role.equals("student")) {
+                    Student student = new Student(retrievedUsername);
+                    return student;
+                } else if (role.equals("teacher")) {
+                    Teacher teacher = new Teacher(retrievedUsername);
+                    return teacher;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -100,6 +109,7 @@ public class Main {
 
         return null; // User not found or error occurred
     }
+
 
 
     private static User authenticate(User user, Scanner scanner) {
@@ -144,7 +154,7 @@ public class Main {
                 Subject subject = entry.getKey();
                 double finalGrade = entry.getValue();
 
-                System.out.println("Subject: " + subject.getName() + ", Final Grade: " + finalGrade);
+               // System.out.println("Subject: " + subject.getName() + ", Final Grade: " + finalGrade);
             }
 
     }
@@ -157,7 +167,7 @@ public class Main {
                 Subject subject = entry.getKey();
                 List<Grade> grades = entry.getValue();
 
-                System.out.println("Subject: " + subject.getName());
+                //System.out.println("Subject: " + subject.getName());
                 for (Grade grade : grades) {
                     System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
                 }
@@ -166,7 +176,7 @@ public class Main {
     }
 
     private static void teacherMenu(Teacher teacher, Scanner scanner) {
-        teacher.initializePermissions();
+
         boolean exit = false;
         while (!exit) {
             System.out.println("Welcome, " + teacher.getName() + " (Teacher)!");
@@ -205,19 +215,11 @@ public class Main {
         System.out.println("Select a subject:");
 
         int subjectNumber = 1;
-        for (Map.Entry<String, Subject> entry : teacher.getSubjects().entrySet()) {
-            System.out.println(subjectNumber + ". " + entry.getKey());
-            subjectNumber++;
-        }
+
 
         int selectedNumber = scanner.nextInt();
 
-        if (selectedNumber >= 1 && selectedNumber <= teacher.getSubjects().size()) {
-            System.out.println(teacher.getSubjects().values().toArray(new Subject[0])[selectedNumber - 1].calculateFinalGradeForThisSubject());
-        } else {
-            System.out.println("Invalid selection.");
 
-        }
     }
     private static void calculateFinalGradesForStudent(Teacher teacher, Scanner scanner) {
         List<Student> students = getAllStudents();
@@ -247,7 +249,7 @@ public class Main {
                 Subject subject = entry.getKey();
                 double finalGrade = entry.getValue();
 
-                System.out.println("Subject: " + subject.getName() + ", Final Grade: " + finalGrade);
+                //System.out.println("Subject: " + subject.getName() + ", Final Grade: " + finalGrade);
             }
         } else {
             System.out.println("Invalid selection.");
@@ -285,7 +287,7 @@ public class Main {
                 Subject subject = entry.getKey();
                 List<Grade> grades = entry.getValue();
 
-                System.out.println("Subject: " + subject.getName());
+                //System.out.println("Subject: " + subject.getName());
                 for (Grade grade : grades) {
                     System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
                 }
@@ -297,99 +299,27 @@ public class Main {
     private static void addGrades(Teacher teacher, Scanner scanner) {
 
         Subject subject = selectSubject(teacher, scanner);
-        if(teacher.hasSubjectPermissions(subject.getName())){
-            if (subject != null) {
-                Student student = selectStudent(subject, scanner);
 
-                if (student != null) {
-                    System.out.println("Enter grade value:");
-                    double gradeValue = scanner.nextDouble();
-
-                    subject.addGrade(student, gradeValue, new Date(), teacher);
-
-                }
-            }
-        }
-        else{
-            System.out.println("Teacher does not have permission to add grades for subject "+subject.getName());
-        }
 
     }
     private static void deleteGrade(Teacher teacher, Scanner scanner) {
 
         Subject subject = selectSubject(teacher, scanner);
-        if(teacher.hasSubjectPermissions(subject.getName())){
-            if (subject != null) {
-                Student student = selectStudent(subject, scanner);
-                List<Grade> gradesForSelectedSubject = student.getGradesBySubject().get(subject);
-                if (student != null && gradesForSelectedSubject != null) {
-                    System.out.println("Do you want to sort each subject's grades by date? (yes/no)");
-                    String sortOption = scanner.next().toLowerCase();
 
 
-                    if (sortOption.equals("yes")) {
-                        Collections.sort(gradesForSelectedSubject, Comparator.comparing(Grade::getInserationDate));
-                    }
-
-                    System.out.println("Grades for " + student.getName() + "at subject "+subject.getName()+" :");
-                    for (Grade grade : gradesForSelectedSubject) {
-                        System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
-                    }
-                    System.out.println("Enter grade index you want to delete: ");
-                    int index = scanner.nextInt();
-
-                    student.deleteGrade(student, index, teacher, subject);
-
-                }
-            }
-        }
-        else{
-            System.out.println("Teacher does not have permission to update grades for subject "+subject.getName());
-        }
 
     }
     private static void updateGrade(Teacher teacher, Scanner scanner) {
 
         Subject subject = selectSubject(teacher, scanner);
-        if(teacher.hasSubjectPermissions(subject.getName())){
-            if (subject != null) {
-                Student student = selectStudent(subject, scanner);
-                List<Grade> gradesForSelectedSubject = student.getGradesBySubject().get(subject);
-                if (student != null && gradesForSelectedSubject != null) {
-                    System.out.println("Do you want to sort each subject's grades by date? (yes/no)");
-                    String sortOption = scanner.next().toLowerCase();
 
-
-                    if (sortOption.equals("yes")) {
-                        Collections.sort(gradesForSelectedSubject, Comparator.comparing(Grade::getInserationDate));
-                    }
-
-                    System.out.println("Grades for " + student.getName() + "at subject "+subject.getName()+" :");
-                    for (Grade grade : gradesForSelectedSubject) {
-                        System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
-                    }
-                    System.out.println("Enter grade index you want to update: ");
-                    int index = scanner.nextInt();
-                    System.out.println("Enter the new grade: ");
-                    double newGrade = scanner.nextDouble();
-                    student.updateGrade(student, index, teacher, subject,newGrade);
-
-                }
-            }
-        }
-        else{
-            System.out.println("Teacher does not have permission to update grades for subject "+subject.getName());
-        }
 
     }
     private static Subject selectSubject(Teacher teacher, Scanner scanner) {
         System.out.println("Select a subject:");
 
         int subjectNumber = 1;
-        for (Subject subject : DataInitializer.getAllSubjects()) {
-            System.out.println(subjectNumber + ". " + subject.getName());
-            subjectNumber++;
-        }
+
 
         int selectedNumber = scanner.nextInt();
 
@@ -438,7 +368,7 @@ public class Main {
         Collections.sort(studentsWithSubject, Comparator.comparing(Student::getName));
         System.out.println("Sorted Student List Alphabetically:");
         for (int i = 0; i < studentsWithSubject.size(); i++) {
-            System.out.println((i + 1) + ". " + studentsWithSubject.get(i).getName());
+           // System.out.println((i + 1) + ". " + studentsWithSubject.get(i).getName());
         }
     }
 }

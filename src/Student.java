@@ -14,7 +14,7 @@ public class Student implements User {
     public void initializeGradesFromList(){
         File file = new File("grades_" + getName() + ".txt");
         if (file.exists()) {
-            initializeGradesFromFile(file);
+
         }
     }
     public String getName() {
@@ -104,33 +104,7 @@ public class Student implements User {
 
 
 
-    private void initializeGradesFromFile(File file) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            Subject currentSubject = null;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("Subject: ")) {
-                    String subjectName = line.substring("Subject: ".length());
-                    for (Map.Entry<Subject, List<Grade>> entry : gradesBySubject.entrySet()) {
-                        Subject subject = entry.getKey();
-                        if (subject.getName().equals(subjectName)) {
-                            currentSubject = subject;
-                            break;
-                        }
-                    }
-                    gradesBySubject.putIfAbsent(currentSubject, new ArrayList<>());
-                } else if (line.startsWith("Grade: ")) {
-                    double gradeValue = Double.parseDouble(line.substring("Grade: ".length()));
-                    String dateString = reader.readLine();
-                    Date gradeDate = parseDate(dateString);
-                    Grade grade = new Grade(gradeValue, gradeDate);
-                    gradesBySubject.get(currentSubject).add(grade);
-                }
-            }
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     private Date parseDate(String dateLine) {
         Date gradeDate = null;

@@ -1,44 +1,32 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 public class DataInitializer {
-    private static List<Subject> allSubjects = new ArrayList<>();
-    public  List<Teacher> initializeTeachers(String fileName){
-        List<Teacher> teachers = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while((line = reader.readLine()) != null){
-                Teacher teacher = extractTeacherFromLine(line);
-                teachers.add(teacher);
-            }
-
-        } catch(IOException e){
+    private Connection connection;
+    public DataInitializer(){
+        try{
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres","postgres","1q2w3e");
+        }
+        catch (SQLException e){
             e.printStackTrace();
         }
-        return teachers;
     }
-    private  Teacher extractTeacherFromLine(String line){
-        String[] parts = line.split(":");
-        String teacherName = parts[0].trim();
-        String[] subjectNames = parts[1].split(",");
-
-        Teacher teacher = new Teacher(teacherName, DataInitializer.this);
-        for (String subjectName : subjectNames) {
-            Subject existingSubject = findSubjectByName(subjectName.trim());
-
-            if (existingSubject == null) {
-                Subject newSubject = new Subject(subjectName.trim(), teacher);
-                teacher.addSubject(subjectName, newSubject);
-                allSubjects.add(newSubject);
-            } else {
-                teacher.addSubject(subjectName, existingSubject);
-            }
+    public boolean teacherHasSubject(String teacherName, String subjectName) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM teacher_subjects WHERE teacher_name = ? AND subject_name = ?");
+            statement.setString(1, teacherName);
+            statement.setString(2, subjectName);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next(); // Returns true if there is a row matching the query
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
-        return teacher;
     }
+    private static List<Subject> allSubjects = new ArrayList<>();
 
     private static Subject findSubjectByName(String subjectName) {
 

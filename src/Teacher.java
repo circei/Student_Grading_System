@@ -1,7 +1,7 @@
-import java.util.*;
+import java.util.Set;
+
 public class Teacher implements User {
     private String name;
-    private Map<String,Subject> subjects;
     private Set<String> permissions;
     private DataInitializer dataInitializer;
     private String password = "teacher";
@@ -9,55 +9,25 @@ public class Teacher implements User {
     public boolean authenticate(String enteredPassword) {
         return this.password.equals(enteredPassword);
     }
-    public Teacher(String name, DataInitializer dataInitializer) {
+
+    public Teacher(String name) {
         this.name = name;
-        this.subjects = new HashMap<>();
-        this.permissions = new HashSet<>();
-        this.dataInitializer = dataInitializer;
-
 
     }
 
-
-
-    public String getName(){
+    public String getName() {
         return name;
-    }
-    public Map<String,Subject> getSubjects(){
-        return subjects;
-    }
-    public void addSubject(String subjectName, Subject subject) {
-        // Check if the subject is already associated with this teacher
-        if (!subjects.containsValue(subject)) {
-            subjects.put(subjectName, subject);
-        }
-    }
-
-
-    public void initializePermissions() {
-        // Grant CRUD permissions for each subject the teacher teaches
-        subjects.keySet().forEach(subjectName -> {
-            grantSubjectPermissions(subjectName);
-        });
-    }
-    private void grantSubjectPermissions(String subjectName) {
-        subjectName = subjectName.trim();
-        permissions.add("CREATE_GRADE_" + subjectName);
-        permissions.add("UPDATE_GRADE_" + subjectName);
-        permissions.add("DELETE_GRADE_" + subjectName);
     }
 
     @Override
     public String getUsername() {
-        // Assuming the teacher's name can be used as a username
-        return name;
+        return name; // Assuming the teacher's name can be used as a username
     }
 
     @Override
     public String getRole() {
-        return "TEACHER";
+        return "teacher";
     }
-
 
     public boolean hasSubjectPermissions(String subjectName) {
         boolean createPermission = permissions.contains("CREATE_GRADE_" + subjectName);
@@ -67,4 +37,31 @@ public class Teacher implements User {
         return createPermission && updatePermission && deletePermission;
     }
 
+    public boolean hasSubject(String subjectName) {
+        return dataInitializer.teacherHasSubject(this.name, subjectName);
+    }
+
+    public void addGrade(String subjectName, Grade grade) {
+        if (hasSubject(subjectName)) {
+            // Add the grade
+        } else {
+            System.out.println("You are not assigned to this subject.");
+        }
+    }
+
+    public void updateGrade(String subjectName, Grade grade) {
+        if (hasSubject(subjectName)) {
+            // Update the grade
+        } else {
+            System.out.println("You are not assigned to this subject.");
+        }
+    }
+
+    public void deleteGrade(String subjectName, Grade grade) {
+        if (hasSubject(subjectName)) {
+            // Delete the grade
+        } else {
+            System.out.println("You are not assigned to this subject.");
+        }
+    }
 }
