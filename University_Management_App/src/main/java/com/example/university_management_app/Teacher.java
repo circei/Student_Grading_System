@@ -1,3 +1,6 @@
+package com.example.university_management_app;
+import com.example.university_management_app.DataInitializer;
+
 import java.util.Set;
 
 public class Teacher implements User {

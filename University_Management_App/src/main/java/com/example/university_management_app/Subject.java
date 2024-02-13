@@ -1,3 +1,4 @@
+package com.example.university_management_app;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;

@@ -1,16 +1,16 @@
+package com.example.university_management_app;
+
+import com.example.university_management_app.DataInitializer;
 
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 
 public class Main {
     private static Map<String, String> userCredentials = new HashMap<>();
     static DataInitializer dataInitializer = new DataInitializer();
 
-    static List<Student> students = dataInitializer.initializeStudents("Students.txt");
-    public static List<Student> getAllStudents(){
-        return students;
-    }
+
+
     static {
         // Predefined user credentials
         userCredentials.put("Constantin George", "berbecul");
@@ -24,9 +24,8 @@ public class Main {
 
     }
     public static void main(String[] args) {
-        for(Student student : students){
-            student.initializeGradesFromList();
-        }
+
+
         while(true) {
             Scanner scanner = new Scanner(System.in);
             User currentUser = authenticateUser(scanner);
@@ -222,79 +221,22 @@ public class Main {
 
     }
     private static void calculateFinalGradesForStudent(Teacher teacher, Scanner scanner) {
-        List<Student> students = getAllStudents();
+
         System.out.println("Select a student:");
         System.out.println("Do you want to sort the student list alphabetically? (yes/no)");
         String sortOption = scanner.next().toLowerCase();
 
-        if (sortOption.equals("yes")) {
-            System.out.println("Select a student:");
-            sortStudentListAlphabetically(students);
-        }
-        else{
-            System.out.println("Select a student:");
-            for (int i = 0; i < students.size(); i++) {
-                System.out.println((i + 1) + ". " + students.get(i).getName());
-            }
-        }
 
-        int selectedOption = scanner.nextInt();
-        if (selectedOption >= 1 && selectedOption <= students.size()) {
-            Student selectedStudent = students.get(selectedOption - 1);
 
-            Map<Subject, Double> finalGrades = selectedStudent.calculateFinalGradeForEachSubject();
 
-            System.out.println("Final Grades for " + selectedStudent.getName() + ":");
-            for (Map.Entry<Subject, Double> entry : finalGrades.entrySet()) {
-                Subject subject = entry.getKey();
-                double finalGrade = entry.getValue();
-
-                //System.out.println("Subject: " + subject.getName() + ", Final Grade: " + finalGrade);
-            }
-        } else {
-            System.out.println("Invalid selection.");
-        }
     }
     private static void seeGradesForStudent(Teacher teacher, Scanner scanner) {
-        List<Student> students = getAllStudents();
+
         System.out.println("Select a student:");
         System.out.println("Do you want to sort the student list alphabetically? (yes/no)");
         String sortOption = scanner.next().toLowerCase();
 
-        if (sortOption.equals("yes")) {
-            System.out.println("Select a student:");
-            sortStudentListAlphabetically(students);
-        }
-        else{
-            System.out.println("Select a student:");
-            for (int i = 0; i < students.size(); i++) {
-                System.out.println((i + 1) + ". " + students.get(i).getName());
-            }
-        }
-        int selectedOption = scanner.nextInt();
-        if (selectedOption >= 1 && selectedOption <= students.size()) {
-            Student selectedStudent = students.get(selectedOption - 1);
-            System.out.println("Do you want to sort each subject's grades by date? (yes/no)");
-            String sortOption2 = scanner.next().toLowerCase();
 
-            Map<Subject, List<Grade>> gradesBySubject = selectedStudent.getGradesBySubject();
-            if (sortOption2.equals("yes")) {
-                gradesBySubject.forEach((subject, grades) -> grades.sort(Comparator.comparing(Grade::getInserationDate)));
-            }
-
-            System.out.println("Grades for " + selectedStudent.getName() + ":");
-            for (Map.Entry<Subject, List<Grade>> entry : gradesBySubject.entrySet()) {
-                Subject subject = entry.getKey();
-                List<Grade> grades = entry.getValue();
-
-                //System.out.println("Subject: " + subject.getName());
-                for (Grade grade : grades) {
-                    System.out.println("   Grade: " + grade.getValue() + ", Date: " + grade.getInserationDate());
-                }
-            }
-        } else {
-            System.out.println("Invalid selection.");
-        }
     }
     private static void addGrades(Teacher teacher, Scanner scanner) {
 

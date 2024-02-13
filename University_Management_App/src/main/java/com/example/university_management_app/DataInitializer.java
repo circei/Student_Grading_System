@@ -1,3 +1,5 @@
+package com.example.university_management_app;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -42,43 +44,5 @@ public class DataInitializer {
         return allSubjects;
     }
 
-    public List<Student> initializeStudents(String fileName) {
-        List<Student> students = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Student student = extractStudentFromLine(line);
-                students.add(student);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return students;
-    }
-
-    private Student extractStudentFromLine(String line) {
-        String[] parts = line.split(":");
-        String studentName = parts[0].trim();
-
-        Student student = new Student(studentName);
-
-
-        if (parts.length > 1) {
-            String[] subjectNames = parts[1].split(",");
-            for (String subjectName : subjectNames) {
-                subjectName = subjectName.trim();
-                Subject existingSubject = findSubjectByName(subjectName);
-
-                if (existingSubject != null) {
-
-                    student.addSubject(existingSubject);
-                    existingSubject.enrollStudent(student);
-                }
-            }
-        }
-
-        return student;
-    }
 }
