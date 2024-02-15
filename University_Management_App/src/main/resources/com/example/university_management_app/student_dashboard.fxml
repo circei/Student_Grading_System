@@ -2,7 +2,10 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #ADD8E6;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.university_management_app.StudentDashboard">
 
@@ -14,19 +17,36 @@
         <Label fx:id="welcomeLabel" layoutY="40.0" style="-fx-font-size: 18px; -fx-text-fill: white;" />
 
         <!-- Navigation Menu -->
-        <AnchorPane layoutX="40.0" layoutY="78.0">
-            <Button layoutX="10.0" prefWidth="120.0" style="-fx-background-color: #3CB371; -fx-text-fill: white;" text="Profile" />
-            <Button layoutX="140.0" prefWidth="120.0" style="-fx-background-color: #3CB371; -fx-text-fill: white;" text="Courses" />
-            <Button layoutX="270.0" prefWidth="120.0" style="-fx-background-color: #3CB371; -fx-text-fill: white;" text="Grades" />
-            <Button layoutX="400.0" prefWidth="120.0" style="-fx-background-color: #3CB371; -fx-text-fill: white;" text="Schedule" />
+        <AnchorPane layoutX="105.0" layoutY="79.0">
+            <Button layoutX="10.0" onAction="#handleProfileButtonAction" prefWidth="120.0" style="-fx-background-color: #3CB371; -fx-text-fill: white;" text="Profile" />
+            <Button layoutX="140.0" onAction="#handleCoursesButtonAction" prefWidth="120.0" style="-fx-background-color: #3CB371; -fx-text-fill: white;" text="Courses" />
+            <Button layoutX="270.0" onAction="#handleGradesButtonAction" prefWidth="120.0" style="-fx-background-color: #3CB371; -fx-text-fill: white;" text="Grades" />
+
         </AnchorPane>
 
         <!-- Content Area -->
         <AnchorPane layoutY="120.0" style="-fx-background-color: #FFFFFF;">
-            <!-- Placeholder for dynamic content -->
-            <!-- You can dynamically load content based on the button clicked in the navigation menu -->
-            <!-- For example, you can load FXML fragments or switch between different views -->
+            <TableView fx:id="gradesTable" layoutY="10.0" prefHeight="380.0" prefWidth="600.0" visible="false">
+                <columns>
+                    <TableColumn fx:id="dateColumn" prefWidth="150.0" text="Date" />
+                    <TableColumn fx:id="subjectColumn" prefWidth="150.0" text="Subject" />
+                    <TableColumn fx:id="gradeColumn" prefWidth="150.0" text="Grade" />
+                    <TableColumn fx:id="passedColumn" prefWidth="150.0" text="Passed" />
+                </columns>
+            </TableView>
+            <TableView fx:id="subjectsTable" layoutY="10.0" prefHeight="380.0" prefWidth="600.0" visible="false">
+                <columns>
+                    <TableColumn fx:id="subjectNameColumn" prefWidth="150.0" text="Subject" />
+                    <TableColumn fx:id="teacherNameColumn" prefWidth="150.0" text="Grade" />
+                    <TableColumn fx:id="creditsColumn" prefWidth="150.0" text="Credits" />
+                </columns>
+            </TableView>
+            <VBox layoutY="10.0" prefHeight="380.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+                <Label fx:id="facultyLabel" />
+                <Label fx:id="specializationLabel" />
+                <Label fx:id="yearOfStudyLabel" />
+            </VBox>
         </AnchorPane>
-         <Button layoutX="466.0" layoutY="14.0" prefWidth="120.0" style="-fx-background-color: #FF6347; -fx-text-fill: white;" text="Logout" />
+         <Button layoutX="466.0" layoutY="14.0" prefWidth="120.0" style="-fx-background-color: #FF6347; -fx-text-fill: white;" text="Logout" onAction="#handleLogoutButtonAction" />
     </children>
 </AnchorPane>

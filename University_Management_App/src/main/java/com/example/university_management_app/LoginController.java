@@ -37,6 +37,7 @@ public class LoginController {
             if ("student".equals(role)) {
                 // Load and display the student dashboard
                 loadStudentDashboard();
+
             } else {
                 // Handle other roles or scenarios
                 System.out.println("User is not a student. Handle other roles here.");
@@ -78,6 +79,9 @@ public class LoginController {
             // Load the student dashboard FXML
             FXMLLoader loader = new FXMLLoader(LoginController.class.getResource("student_dashboard.fxml"));
             Parent root = loader.load();
+
+            StudentDashboard studentDashboardController = loader.getController();
+            studentDashboardController.setUsername(usernameField.getText());
 
             // Get the reference to the current scene
             Scene currentScene = usernameField.getScene();

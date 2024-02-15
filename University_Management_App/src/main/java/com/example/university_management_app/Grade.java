@@ -1,25 +1,47 @@
 package com.example.university_management_app;
-import java.util.*;
+
 public class Grade {
-    private double value;
-    private Date inserationDate;
+    private String date;
+    private String subject;
+    private int grade;
+    private String passed;
 
-    public Grade(double value, Date inserationDate){
-        this.value = value;
-        this.inserationDate = inserationDate;
+    public Grade(String date, String subject, int grade, String passed) {
+        this.date = date;
+        this.subject = subject;
+        this.grade = grade;
+        this.passed = passed;
     }
 
-    public Grade() {
-
+    public String getDate() {
+        return date;
     }
 
-    public double getValue(){
-        return value;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public void setValue(double newValue){this.value = newValue;}
+    public String getSubject() {
+        return subject;
+    }
 
-    public Date getInserationDate(){
-        return inserationDate;
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public int getGrade() {
+        return grade;
+    }
+
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
+    public String getPassed() {
+        return passed;
+    }
+
+    public void setPassed(String passed) {
+        this.passed = passed;
     }
 }

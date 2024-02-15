@@ -28,21 +28,6 @@ public class DataInitializer {
             return false;
         }
     }
-    private static List<Subject> allSubjects = new ArrayList<>();
-
-    private static Subject findSubjectByName(String subjectName) {
-
-        for (Subject existingSubject : allSubjects) {
-            if (existingSubject.getName().equals(subjectName)) {
-                return existingSubject;
-            }
-        }
-        return null;
-    }
-
-    public static List<Subject> getAllSubjects() {
-        return allSubjects;
-    }
 
 
 }

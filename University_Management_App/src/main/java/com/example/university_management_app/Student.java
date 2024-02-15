@@ -26,49 +26,10 @@ public class Student implements User {
         return gradesBySubject;
     }
 
-    public void addGrade(Subject subject, double value, Date insertionDate, Teacher teacher) {
-        Grade grade = new Grade(value, insertionDate);
-        if (!gradesBySubject.containsKey(subject)) {
-                    gradesBySubject.put(subject, new ArrayList<>());
-        }
-        gradesBySubject.get(subject).add(grade);
-        saveGradesToFile(subject,grade);
-        System.out.println("Grade added successfully.");
-    }
-    public void deleteGrade(Student student, int index, Teacher teacher, Subject subject ){
-            gradesBySubject.get(subject).remove(index);
-            overwriteGradesToFile(student);
-            System.out.println("Grade deleted");
-    }
-    public void updateGrade(Student student, int index, Teacher teacher, Subject subject, double newGrade){
-        gradesBySubject.get(subject).get(index).setValue(newGrade);
-        overwriteGradesToFile(student);
-        System.out.println("Grade updated");
-    }
 
-    public void overwriteGradesToFile(Student student) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("grades_" + student.getName() + ".txt"))) {
-            for (Map.Entry<Subject, List<Grade>> entry : gradesBySubject.entrySet()) {
-                Subject subject = entry.getKey();
-                List<Grade> grades = entry.getValue();
 
-                for (Grade grade : grades) {
-                    writer.println("Subject: " + subject.getName());
-                    writer.println("Grade: " + grade.getValue());
-                    writer.println("Date: " + grade.getInserationDate());
-                    writer.println("-----");
-                }
-            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public void addSubject(Subject subject) {
-        if (!gradesBySubject.containsKey(subject)) {
-            gradesBySubject.put(subject, new ArrayList<>());
-        }
-    }
+
 
     @Override
     public String getUsername() {
@@ -79,29 +40,10 @@ public class Student implements User {
         return "student";
     }
 
-    public Map<Subject, Double> calculateFinalGradeForEachSubject() {
-        Map<Subject, Double> finalGrades = new HashMap<>();
-
-        for (Map.Entry<Subject, List<Grade>> entry : gradesBySubject.entrySet()) {
-            Subject subject = entry.getKey();
-            List<Grade> grades = entry.getValue();
-            double averageGrade = grades.stream().mapToDouble(Grade::getValue).average().orElse(0.0);
-            finalGrades.put(subject, averageGrade);
-        }
-        return finalGrades;
-    }
 
 
-    public void saveGradesToFile(Subject subject, Grade grade) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("grades_" + getName() + ".txt", true))) {
-            writer.println("Subject: " + subject.getName());
-            writer.println("Grade: " + grade.getValue());
-            writer.println("Date: " + grade.getInserationDate());
-            writer.println("-----");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
+
 
 
 
