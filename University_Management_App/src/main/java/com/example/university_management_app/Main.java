@@ -1,16 +1,33 @@
 package com.example.university_management_app;
 
-import com.example.university_management_app.DataInitializer;
+import javafx.application.Application;
 
-import java.sql.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
-public class Main {
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+public class Main extends Application {
     private static Map<String, String> userCredentials = new HashMap<>();
     static DataInitializer dataInitializer = new DataInitializer();
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
+        Parent root = loader.load();
+        LoginController controller = loader.getController();
+        primaryStage.setScene(new Scene(root, 600, 400));
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
 
-
+/*
     static {
         // Predefined user credentials
         userCredentials.put("Constantin George", "berbecul");
@@ -313,4 +330,6 @@ public class Main {
            // System.out.println((i + 1) + ". " + studentsWithSubject.get(i).getName());
         }
     }
+
+ */
 }
