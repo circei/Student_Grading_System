@@ -10,6 +10,9 @@ public class Subject {
         this.teacher = teacher;
         this.credits = credits;
     }
+    public Subject(String subjectName){
+        this.subjectName = subjectName;
+    }
 
     public String getSubjectName() {
         return subjectName;

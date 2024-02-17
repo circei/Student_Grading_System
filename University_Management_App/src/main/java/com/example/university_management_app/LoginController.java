@@ -35,12 +35,10 @@ public class LoginController {
             // Check the role
             String role = userDetails[1];
             if ("student".equals(role)) {
-                // Load and display the student dashboard
                 loadStudentDashboard();
 
-            } else {
-                // Handle other roles or scenarios
-                System.out.println("User is not a student. Handle other roles here.");
+            } else if("teacher".equals(role)) {
+                loadTeacherDashboard();
             }
         } else {
             // Authentication failed
@@ -82,6 +80,24 @@ public class LoginController {
 
             StudentDashboard studentDashboardController = loader.getController();
             studentDashboardController.setUsername(usernameField.getText());
+
+            // Get the reference to the current scene
+            Scene currentScene = usernameField.getScene();
+
+            // Replace the content of the current scene with the student dashboard content
+            currentScene.setRoot(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private  void loadTeacherDashboard() {
+        try {
+            // Load the student dashboard FXML
+            FXMLLoader loader = new FXMLLoader(LoginController.class.getResource("teacher_dashboard.fxml"));
+            Parent root = loader.load();
+
+            TeacherDashboard teacherDashboardController = loader.getController();
+            teacherDashboardController.setUsername(usernameField.getText());
 
             // Get the reference to the current scene
             Scene currentScene = usernameField.getScene();
