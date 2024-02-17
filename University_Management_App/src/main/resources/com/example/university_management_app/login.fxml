@@ -8,15 +8,12 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #ADD8E6;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml"
-           fx:controller="com.example.university_management_app.LoginController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #ADD8E6;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.university_management_app.LoginController">
    <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
             <AnchorPane prefHeight="118.0" prefWidth="600.0">
                <children>
-                  <Button layoutX="558.0" layoutY="14.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="27.0" style="-fx-background-color: #ADD8E6; -fx-text-fill: white;" />
-                  <Label layoutX="568.0" layoutY="18.0" text="X" />
                   <Label layoutX="263.0" layoutY="105.0" prefHeight="111.0" prefWidth="103.0" text="👤">
                      <font>
                         <Font size="76.0" />
@@ -27,11 +24,10 @@
                <children>
                   <TextField fx:id="usernameField" layoutX="204.0" layoutY="36.0" prefHeight="26.0" prefWidth="191.0" promptText="username" />
                   <PasswordField fx:id="passwordField" layoutX="203.0" layoutY="80.0" prefHeight="26.0" prefWidth="191.0" promptText="password" />
-                  <Button layoutX="265.0" layoutY="130.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="66.0" style="-fx-background-color: #3CB371; -fx-text-fill: white;" text="Login" onAction="#handleLoginButton" />
+                  <Button layoutX="265.0" layoutY="130.0" mnemonicParsing="false" onAction="#handleLoginButton" prefHeight="26.0" prefWidth="66.0" style="-fx-background-color: #3CB371; -fx-text-fill: white;" text="Login" />
                </children>
             </AnchorPane>
          </children>
       </AnchorPane>
    </children>
 </StackPane>
-

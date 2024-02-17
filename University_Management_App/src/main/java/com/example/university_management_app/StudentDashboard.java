@@ -146,8 +146,6 @@ public class StudentDashboard {
         subjectsTable.setVisible(false);
         gradesTable.setVisible(true);
         populateGradesTable(username);
-
-
     }
 
     @FXML

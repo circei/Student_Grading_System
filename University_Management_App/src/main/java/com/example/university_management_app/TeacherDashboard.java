@@ -10,13 +10,25 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-
+import javafx.scene.control.ComboBox;
 
 import java.io.IOException;
 import java.sql.*;
 import java.util.Optional;
 
 public class TeacherDashboard {
+    @FXML
+    private TableView<Grade> gradesTable;
+    @FXML
+    private TableColumn<Grade, String> dateColumn;
+    @FXML
+    private TableColumn<Grade, String> subjectColumn;
+
+    @FXML
+    private TableColumn<Grade, Integer> gradeColumn;
+
+    @FXML
+    private TableColumn<Grade, String> passedColumn;
     private String username;
     @FXML
     private Label welcomeLabel;
@@ -76,23 +88,50 @@ public class TeacherDashboard {
         subjectsTable.setVisible(true);
         studentTable.setVisible(false);
         facultyLabel.setVisible(false);
+        gradesTable.setVisible(false);
         specializationLabel.setVisible(false);
         subjectsTable.toFront();
         fetchAndDisplaySubjects();
     }
 
-    public void handleStudentGradesButtonAction(ActionEvent actionEvent) {
+
+    private void populateGradesTable(String username){
+        try {
+            PreparedStatement statement = conn.prepareStatement("SELECT date, subject, grade, passed FROM student_grades WHERE username = ?");
+            statement.setString(1, username);
+            ResultSet rs = statement.executeQuery();
+
+            ObservableList<Grade> gradesList = gradesTable.getItems();
+            gradesList.clear(); // Clear previous data
+
+            while (rs.next()) {
+                String date = rs.getString("date");
+                String subject = rs.getString("subject");
+                int grade = rs.getInt("grade");
+                String passed = rs.getString("passed");
+
+                Grade gradeObj = new Grade(date, subject, grade, passed);
+                gradesList.add(gradeObj);
+            }
+            gradesTable.setItems(gradesList);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     @FXML
     private void initialize() {
-        // Initialize database connection
+
         try {
             conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "1q2w3e");
         } catch (SQLException e) {
             e.printStackTrace();
         }
         subjectNameColumn.setCellValueFactory(new PropertyValueFactory<>("subjectName"));
-
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        subjectColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
+        gradeColumn.setCellValueFactory(new PropertyValueFactory<>("grade"));
+        passedColumn.setCellValueFactory(new PropertyValueFactory<>("passed"));
         subjectsTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 1) { // Check if single click
                 // Get the selected subject
@@ -110,85 +149,102 @@ public class TeacherDashboard {
                 }
             }
         });
-
-
-
     }
+
+
     private void openGradeInputDialog(Student student) {
+        // Create a ComboBox for options
+        ComboBox<String> options = new ComboBox<>();
+        options.getItems().addAll("Add Grade", "See Grades");
+        options.setValue("Add Grade"); // Default value
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Select Option");
+        alert.setHeaderText("Select an option for student: " + student.getUsername());
+        alert.getDialogPane().setContent(options);
+
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(okButton, cancelButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == okButton) {
+            String selectedOption = options.getValue();
+            if (selectedOption.equals("Add Grade")) {
+                openAddGradeDialog(student);
+            } else if (selectedOption.equals("See Grades")) {
+                subjectsTable.setVisible(false);
+                studentTable.setVisible(false);
+                facultyLabel.setVisible(false);
+                gradesTable.setVisible(true);
+                specializationLabel.setVisible(false);
+                subjectsTable.toFront();
+                fetchAndDisplaySubjects();
+                populateGradesTable(student.getUsername());
+            }
+        }
+    }
+    private void openAddGradeDialog(Student student) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Add Grade");
         alert.setHeaderText("Add grade for student: " + student.getUsername());
         alert.setContentText("Enter grade:");
 
-        // Create a text input field for the grade
         TextField gradeField = new TextField();
         alert.getDialogPane().setContent(gradeField);
 
-        // Add buttons for OK and Cancel
         ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(okButton, cancelButton);
 
-        // Handle OK button click event
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == okButton) {
-            String grade = gradeField.getText();
-            // Now you can handle adding the grade to the database
-            addGradeToDatabase(student, grade);
-        }
+        alert.showAndWait().ifPresent(buttonType -> {
+            if (buttonType == okButton) {
+                String grade = gradeField.getText();
+                addGradeToDatabase(student, grade);
+            }
+        });
     }
+
     private void addGradeToDatabase(Student student, String grade) {
         try {
             Subject selectedSubject = subjectsTable.getSelectionModel().getSelectedItem();
-            // Prepare the SQL statement to insert the grade into the database
             String sql = "INSERT INTO student_grades (date, subject, grade, passed, username) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement statement = conn.prepareStatement(sql);
 
-            // Set the parameters for the SQL statement
             statement.setDate(1, new java.sql.Date(System.currentTimeMillis())); // Set the current date
             statement.setString(2, selectedSubject.getSubjectName()); // Set the subject name
             statement.setInt(3, Integer.parseInt(grade)); // Set the grade
             statement.setBoolean(4, determinePassed(grade)); // Set whether the student passed based on the grade
             statement.setString(5, student.getUsername()); // Set the student's username
 
-            // Execute the SQL statement
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {
                 System.out.println("A new grade was added successfully!");
             }
-
-            // Close the connection
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private boolean determinePassed(String grade) {
-        // Implement your logic to determine if the student passed based on the grade
-        // For example, you might consider any grade above a certain threshold to be a pass
         double numericGrade = Double.parseDouble(grade);
-        return numericGrade >= 5.0; // Assuming a passing grade is 5 or higher
+        return numericGrade >= 5.0;
     }
 
     private void fetchAndDisplayStudents(Subject selectedSubject) {
         try {
-            // Prepare the SQL statement to select students based on the subject name
+
             PreparedStatement statement = conn.prepareStatement("SELECT username FROM subjects WHERE \"subjectName\" = ?");
             statement.setString(1, selectedSubject.getSubjectName());
 
-            // Execute the query
             ResultSet rs = statement.executeQuery();
 
-            // Populate a list of students associated with the selected subject
             ObservableList<Student> studentsList = FXCollections.observableArrayList();
             while (rs.next()) {
-                // Assuming Student class has constructor with necessary parameters like username, subjectName, etc.
                 Student student = new Student(rs.getString("username"));
                 studentsList.add(student);
             }
 
-            // Display the fetched students
             displayStudents(studentsList);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -205,7 +261,6 @@ public class TeacherDashboard {
         studentTable.toFront();
 
     }
-
 
     private void fetchAndDisplaySubjects() {
         try {
@@ -228,21 +283,13 @@ public class TeacherDashboard {
         }
     }
 
-
-
     @FXML
     private void handleLogoutButtonAction() {
         Stage stage = (Stage) welcomeLabel.getScene().getWindow();
-
-        // Load the login scene
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
             Parent root = loader.load();
-
-            // Create a new scene
             Scene scene = new Scene(root);
-
-            // Set the scene in the stage
             stage.setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();
